@@ -1,3 +1,4 @@
+import 'package:dhun/features/auth/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
@@ -12,36 +13,43 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => OnboardingBloc(),
-      child: BlocListener<OnboardingBloc, OnboardingState>(
-        listener: (context, state) {
-          if (state is NavigatingToHome) {
-            print("SUCCESS! BlocListener heard the state change and is ready to navigate.");
-            
-          }
-        },
-        child: Scaffold(
-          body: AppBg(
-            child: SafeArea(
-              child:SingleChildScrollView( 
-              child:Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Image.asset('assets/images/headphones.png', height: 250),
-                  _buildArtistAvatars(),
-                  _buildTextContent(),
-                  _buildLetsGoButton(context),
-                ],
+Widget build(BuildContext context) {
+  return BlocProvider(
+    create: (context) => OnboardingBloc(),
+    // We need to add a Builder here to provide a new 'context'
+    // that knows about the OnboardingBloc.
+    child: Builder(
+      builder: (context) { // This context can "see" the BLoC.
+        return BlocListener<OnboardingBloc, OnboardingState>(
+          listener: (context, state) {
+            if (state is NavigatingToHome) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            }
+          },
+          child: Scaffold(
+            body: AppBg( // Your custom background widget
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Image.asset('assets/images/headphones.png', height: 250),
+                      _buildArtistAvatars(),
+                      _buildTextContent(),
+                      _buildLetsGoButton(context), // This will now work correctly
+                    ],
+                  ),
+                ),
               ),
             ),
-          )
           ),
-        ),
-      ),
-    );
-  }
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildArtistAvatars() {
     return SizedBox(
@@ -52,37 +60,72 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Positioned(
             top: 10,
             left: 100,
-            child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('https://in.pinterest.com/pin/824158800534587359/')),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(
+                'https://in.pinterest.com/pin/824158800534587359/',
+              ),
+            ),
           ),
           Positioned(
             left: 20,
             top: 60,
-            child: CircleAvatar(radius: 35, backgroundImage: NetworkImage('https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3')),
+            child: CircleAvatar(
+              radius: 35,
+              backgroundImage: NetworkImage(
+                'https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3',
+              ),
+            ),
           ),
           Positioned(
             right: 30,
             top: 50,
-            child: CircleAvatar(radius: 35, backgroundImage: NetworkImage('https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102')),
+            child: CircleAvatar(
+              radius: 35,
+              backgroundImage: NetworkImage(
+                'https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102',
+              ),
+            ),
           ),
           Positioned(
             left: 170,
             top: 50,
-            child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102')),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(
+                'https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102',
+              ),
+            ),
           ),
           Positioned(
             left: 230,
             top: 5,
-            child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3')),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(
+                'https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3',
+              ),
+            ),
           ),
           Positioned(
             left: 230,
             top: 80,
-            child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3')),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(
+                'https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3',
+              ),
+            ),
           ),
           Positioned(
             left: 100,
             top: 80,
-            child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102')),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(
+                'https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102',
+              ),
+            ),
           ),
         ],
       ),
@@ -94,10 +137,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       padding: EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
         children: [
-          Text('Discover music tailored for endless inspirations', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+          Text(
+            'Discover music tailored for endless inspirations',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           SizedBox(height: 16),
-          Text('Discover music tailored to your soul, mood, and every unique moment', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 16)),
-          SizedBox(height: 16,)
+          Text(
+            'Discover music tailored to your soul, mood, and every unique moment',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white70, fontSize: 16),
+          ),
+          SizedBox(height: 16),
         ],
       ),
     );
@@ -114,9 +169,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           padding: const EdgeInsets.symmetric(vertical: 20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purple], begin: Alignment.centerLeft, end: Alignment.centerRight),
+            gradient: const LinearGradient(
+              colors: [Colors.pinkAccent, Colors.purple],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
           ),
-          child: const Center(child: Text('Let\'s Go', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold))),
+          child: const Center(
+            child: Text(
+              "Let's Go",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ),
     );

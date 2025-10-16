@@ -78,6 +78,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   style: const TextStyle(fontSize: 16),
                 ),
+                const SizedBox(height: 16,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 2
+                            )
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text("Terms and Conditions")
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: (){},
+                       child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold
+                        ),
+                       )
+                      ),
+                  ],
+                ),
                 const SizedBox(height: 32),
                 GradientButton(
                   text: "Login",
@@ -85,6 +118,44 @@ class _LoginScreenState extends State<LoginScreen> {
                     print("Login Button tapped!");
                   },
                 ),
+                const SizedBox(height: 40,),
+                const Row(
+                  children: [
+                    Expanded(
+                      child:Divider(color: Colors.white54,)),
+                      Padding(padding:
+                      EdgeInsetsGeometry.symmetric(horizontal: 16.0),
+                       child: Text(
+                        "Or",
+                        style: TextStyle(color: Colors.white54),
+                       ),
+                       ),
+                       Expanded(child: Divider(color: Colors.white54,))
+                      
+                  ],
+                ),
+                const SizedBox(height: 40),
+                Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Image(
+                      width: 24,
+                      height: 24,
+                      image: AssetImage("assets/images/google.png"),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Image(
+                      width: 24,
+                      height: 24,
+                      image: AssetImage("assets/images/facebook.png"),
+                    ),
+                  ),
+                ],
+              ),
               ],
             ),
           ),
