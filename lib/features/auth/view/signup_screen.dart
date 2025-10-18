@@ -2,15 +2,16 @@ import 'package:dhun/core/widgets/gradient_button.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,10 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 100),
 
                 const Text(
-                  "Log In",
+                  "Sign Up",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
                 const Text("Email", style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 TextField(
@@ -36,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     filled: true,
                     fillColor: Colors.grey.shade800,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
@@ -78,41 +79,43 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text("Terms and Conditions"),
-                      ],
+                const SizedBox(height: 24,),
+                const Text("Confirm Password", style: TextStyle(fontSize: 16)),
+                const SizedBox(height: 8),
+                TextField(
+                  obscureText: _isConfirmPasswordVisible,
+                  decoration: InputDecoration(
+                    hintText: "Comfirm Password",
+                    filled: true,
+                    fillColor: Colors.grey.shade800,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "Forgot Password?",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                        });
+                      },
+                      icon: Icon(
+                        _isConfirmPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                     ),
-                  ],
+                  ),
+                  style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 GradientButton(
-                  text: "Login",
+                  text: "Sign Up",
                   onPressed: () {
-                    print("Login Button tapped!");
+                    print("Sign Up Button tapped!");
                   },
                 ),
                 const SizedBox(height: 40),
@@ -151,17 +154,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account?  ",
+                      "Already have an account? ",
                       style: TextStyle(color: Colors.grey),
                     ),
-                    TextButton(onPressed: () {}, child: Text("Sign Up")),
+                    TextButton(onPressed: () {}, child: Text("Signin",
+                    style: TextStyle(
+                      color: Colors.white54,
+                      fontWeight: FontWeight.bold,
+                    ),
+                      ),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 8,)
               ],
             ),
           ),
