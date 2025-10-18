@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Song Rec App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
-      home: const SignupScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }

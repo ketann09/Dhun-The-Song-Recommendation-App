@@ -1,4 +1,5 @@
 import 'package:dhun/core/widgets/gradient_button.dart';
+import 'package:dhun/features/auth/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
 
@@ -79,7 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(height: 24,),
+                const SizedBox(height: 24),
                 const Text("Confirm Password", style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 TextField(
@@ -99,7 +100,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     suffixIcon: IconButton(
                       onPressed: () {
                         setState(() {
-                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          _isConfirmPasswordVisible =
+                              !_isConfirmPasswordVisible;
                         });
                       },
                       icon: Icon(
@@ -115,7 +117,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 GradientButton(
                   text: "Sign Up",
                   onPressed: () {
-                    print("Sign Up Button tapped!");
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
                   },
                 ),
                 const SizedBox(height: 40),
@@ -162,16 +166,25 @@ class _SignupScreenState extends State<SignupScreen> {
                       "Already have an account? ",
                       style: TextStyle(color: Colors.grey),
                     ),
-                    TextButton(onPressed: () {}, child: Text("Signin",
-                    style: TextStyle(
-                      color: Colors.white54,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Signin",
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8,)
+                const SizedBox(height: 8),
               ],
             ),
           ),

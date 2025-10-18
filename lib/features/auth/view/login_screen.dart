@@ -1,4 +1,5 @@
 import 'package:dhun/core/widgets/gradient_button.dart';
+import 'package:dhun/features/auth/view/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
 
@@ -159,7 +160,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       "Don't have an account?  ",
                       style: TextStyle(color: Colors.grey),
                     ),
-                    TextButton(onPressed: () {}, child: Text("Sign Up")),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const SignupScreen(),
+                          ),
+                        );
+                      },
+                      child: Text("Sign Up"),
+                    ),
                   ],
                 ),
               ],
