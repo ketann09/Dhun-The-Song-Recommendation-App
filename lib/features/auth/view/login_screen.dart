@@ -1,4 +1,5 @@
 import 'package:dhun/core/widgets/gradient_button.dart';
+import 'package:dhun/features/auth/view/forgot_passwrd_screen.dart';
 import 'package:dhun/features/auth/view/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
@@ -98,7 +99,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen(),
+                          ),
+                        );
+                      },
                       child: const Text(
                         "Forgot Password?",
                         style: TextStyle(
