@@ -16,10 +16,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 Widget build(BuildContext context) {
   return BlocProvider(
     create: (context) => OnboardingBloc(),
-    // We need to add a Builder here to provide a new 'context'
-    // that knows about the OnboardingBloc.
     child: Builder(
-      builder: (context) { // This context can "see" the BLoC.
+      builder: (context) { 
         return BlocListener<OnboardingBloc, OnboardingState>(
           listener: (context, state) {
             if (state is NavigatingToHome) {
@@ -29,7 +27,7 @@ Widget build(BuildContext context) {
             }
           },
           child: Scaffold(
-            body: AppBg( // Your custom background widget
+            body: AppBg( 
               child: SafeArea(
                 child: SingleChildScrollView(
                   child: Column(
@@ -38,8 +36,8 @@ Widget build(BuildContext context) {
                       Image.asset('assets/images/headphones.png', height: 250),
                       _buildArtistAvatars(),
                       _buildTextContent(),
-                      _buildLetsGoButton(context), // This will now work correctly
-                    ],
+                      _buildLetsGoButton(context),   
+                      ],
                   ),
                 ),
               ),
