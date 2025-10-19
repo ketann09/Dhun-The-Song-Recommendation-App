@@ -18,10 +18,17 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       _buildAppBar(context),
-                      const SizedBox(height: 24)
-                      // 1. Custom AppBar will go here
-                      // 2. Profile Header will go here
-                      // 3. Settings List will go here
+                      const SizedBox(height: 24),
+                      _buildProfileHeader(),
+                      const SizedBox(height: 32),
+                     _buildSettingsTile(icon: Icons.edit_outlined, title: 'Edit Profile'),
+                     _buildSettingsTile(icon: Icons.graphic_eq, title: 'Audio Quality'),
+                     _buildSettingsTile(icon: Icons.video_settings_outlined, title: 'Video Quality'),
+                     _buildSettingsTile(icon: Icons.cloud_download_outlined, title: 'Downloaded'),
+                     _buildSettingsTile(icon: Icons.language, title: 'Language'),
+                     _buildSettingsTile(icon: Icons.storage, title: 'Storage'),
+                     _buildSettingsTile(icon: Icons.settings_outlined, title: 'Setting'),
+                     _buildSettingsTile(icon: Icons.feedback_outlined, title: 'Feedbacks'),
                     ],
                   ),
                 ),
@@ -53,6 +60,45 @@ Widget _buildAppBar(BuildContext context) {
           IconButton(icon: const Icon(Icons.search), onPressed: () {}),
         ],
       ),
+    ],
+  );
+}
+
+Widget _buildProfileHeader() {
+  return const Row(
+    children: [
+      CircleAvatar(
+        radius: 40,
+        backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
+      ),
+      SizedBox(width: 16),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Amit',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            '@amitrai7',
+            style: TextStyle(fontSize: 16, color: Colors.white70),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+Widget _buildSettingsTile({required IconData icon, required String title}) {
+  return Column(
+    children: [
+      ListTile(
+        leading: Icon(icon, color: Colors.white),
+        title: Text(title, style: const TextStyle(fontSize: 18)),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
+        onTap: () {},
+      ),
+      const Divider(color: Colors.white24, indent: 16, endIndent: 16),
     ],
   );
 }
