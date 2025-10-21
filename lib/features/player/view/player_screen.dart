@@ -1,42 +1,57 @@
 import 'package:dhun/core/widgets/app_bg.dart';
+import 'package:dhun/features/player/widgets/more_options.dart';
 import 'package:flutter/material.dart';
 
 class PlayerScreen extends StatelessWidget {
   const PlayerScreen({super.key});
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: AppBg(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildAppBar(context),
-                _buildAlbumArt(),
-                _buildSongInfo(),
-                const SizedBox(height: 16),
-                _buildProgressBar(context),
-                _buildPlayerControls(),
-                _buildSocialActions(),
-                
-                const Column(
-                  children: [
-                    Icon(Icons.keyboard_arrow_up),
-                    Text('More'),
-                  ],
-                ),
-                const SizedBox(height: 16), 
-              ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: AppBg(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildAppBar(context),
+                  _buildAlbumArt(),
+                  _buildSongInfo(),
+                  const SizedBox(height: 16),
+                  _buildProgressBar(context),
+                  _buildPlayerControls(),
+                  _buildSocialActions(),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: const Color(0xFF1E1E1E),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            topRight: Radius.circular(24),
+                          ),
+                        ),
+                        builder: (context) {
+                          return const MoreOptionsSheet();
+                        },
+                      );
+                    },
+                    child: const Column(
+                      children: [Icon(Icons.keyboard_arrow_up), Text('More')],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 Widget _buildAppBar(BuildContext context) {
@@ -64,7 +79,8 @@ Widget _buildAlbumArt() {
     padding: const EdgeInsets.symmetric(vertical: 32.0),
     child: ClipRRect(
       borderRadius: BorderRadius.circular(24),
-      child: Image.asset('assets/images/saiyaara.png',
+      child: Image.asset(
+        'assets/images/saiyaara.png',
         height: 300,
         width: 300,
         fit: BoxFit.cover,
@@ -100,9 +116,7 @@ Widget _buildSongInfo() {
 }
 
 Widget _buildProgressBar(BuildContext context) {
-  // We'll use dummy values for now.
-  // This will be managed by a state variable later.
-  double _currentSliderValue = 20;
+  double currentSliderValue = 20;
 
   return Column(
     children: [
@@ -116,22 +130,17 @@ Widget _buildProgressBar(BuildContext context) {
           thumbColor: Colors.white,
         ),
         child: Slider(
-          value: _currentSliderValue,
+          value: currentSliderValue,
           min: 0,
           max: 100,
-          onChanged: (value) {
-            // setState will be used here later
-          },
+          onChanged: (value) {},
         ),
       ),
       const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('1:24'),
-            Text('3:58'),
-          ],
+          children: [Text('1:24'), Text('3:58')],
         ),
       ),
     ],
@@ -170,11 +179,7 @@ Widget _buildPlayerControls() {
 Widget _buildSocialActions() {
   Widget buildSocialButton(IconData icon, String label) {
     return Column(
-      children: [
-        Icon(icon, size: 28),
-        const SizedBox(height: 4),
-        Text(label),
-      ],
+      children: [Icon(icon, size: 28), const SizedBox(height: 4), Text(label)],
     );
   }
 
