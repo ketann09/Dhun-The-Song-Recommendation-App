@@ -1,5 +1,6 @@
 import 'dart:ui';
-
+import 'package:dhun/features/home/view/home_screen.dart';
+import 'package:dhun/features/profile/view/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class NavBar extends StatelessWidget {
@@ -26,18 +27,24 @@ class NavBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(icon: const Icon(Icons.home_outlined), onPressed: () {}),
-                IconButton(icon: const Icon(Icons.replay_outlined), onPressed: () {}),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: const Icon(Icons.music_note, color: Colors.black),
-                ),
+                IconButton(icon: const Icon(Icons.home_outlined), onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                      ),
+                    );
+                }
+              ),
+              IconButton(icon: const Icon(Icons.replay_outlined), onPressed: () {}),
+                IconButton(icon: const Icon(Icons.music_note), onPressed: () {}),
                 IconButton(icon: const Icon(Icons.notifications_none_outlined), onPressed: () {}),
-                IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
+                IconButton(icon: const Icon(Icons.person_outline), onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                      ),
+                    );
+                }),
               ],
             ),
           ),
