@@ -3,6 +3,8 @@ import 'package:dhun/features/auth/view/forgot_passwrd_screen.dart';
 import 'package:dhun/features/auth/view/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
+import '../../home/view/home_screen.dart' show HomeScreen;
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +15,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text("Email", style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: emailController,
                   decoration: InputDecoration(
                     hintText: "name@domain.com",
                     filled: true,
@@ -52,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text("Password", style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: passwordController,
                   obscureText: _isPasswordVisible,
                   decoration: InputDecoration(
                     hintText: "Enter your Password",
@@ -119,8 +126,34 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32),
                 GradientButton(
                   text: "Login",
-                  onPressed: () {
-                    print("Login Button tapped!");
+                  onPressed: () async {
+                    final authService = AuthService();
+                    final email = emailController.text.trim();
+                    final password = passwordController.text.trim();
+
+                    final error = await authService.login(email, password);
+                    if (error != null) {
+                      // Show error dialog
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Login Failed"),
+                          content: Text(error),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // Login success, navigate to HomeScreen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      );
+                    }
                   },
                 ),
                 const SizedBox(height: 40),
