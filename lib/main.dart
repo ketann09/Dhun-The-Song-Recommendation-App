@@ -1,22 +1,26 @@
-import 'package:dhun/features/auth/view/login_screen.dart';
-import 'package:dhun/features/auth/view/signup_screen.dart';
-import 'package:dhun/features/home/view/home_screen.dart';
-import 'package:dhun/features/player/view/player_screen.dart';
-import 'package:dhun/features/search/view/search_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:dhun/features/onboarding/view/onboarding_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'features/onboarding/view/onboarding_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget
+{
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Song Rec App',
+  Widget build(BuildContext context)
+  {
+    return MaterialApp
+      (
+      title: 'Dhun',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: const OnboardingScreen(),

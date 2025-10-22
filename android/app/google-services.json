@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "39167277239",
+    "project_id": "song-app-55d7b",
+    "storage_bucket": "song-app-55d7b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39167277239:android:179084965f3d43f2cbb532",
+        "android_client_info": {
+          "package_name": "com.example.dhun"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg1G2bGegHdCNE9kv-2CZupnaMrzm_Fwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39167277239:android:579efeeedd2754accbb532",
+        "android_client_info": {
+          "package_name": "com.example.dhun_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg1G2bGegHdCNE9kv-2CZupnaMrzm_Fwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,6 +2,7 @@ import 'package:dhun/core/widgets/gradient_button.dart';
 import 'package:dhun/features/auth/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
+import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -9,6 +10,10 @@ class SignupScreen extends StatefulWidget {
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
+final TextEditingController emailController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
+final TextEditingController confirmPasswordController = TextEditingController();
+final TextEditingController nameController = TextEditingController();
 
 class _SignupScreenState extends State<SignupScreen> {
   bool _isPasswordVisible = false;
@@ -33,6 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const Text("Email", style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: emailController,
                   decoration: InputDecoration(
                     hintText: "name@domain.com",
                     filled: true,
@@ -53,6 +59,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 8),
                 TextField(
                   obscureText: _isPasswordVisible,
+                  controller: passwordController,
                   decoration: InputDecoration(
                     hintText: "Enter your Password",
                     filled: true,
@@ -85,6 +92,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 8),
                 TextField(
                   obscureText: _isConfirmPasswordVisible,
+                  controller: confirmPasswordController,
                   decoration: InputDecoration(
                     hintText: "Comfirm Password",
                     filled: true,
@@ -116,10 +124,51 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 16),
                 GradientButton(
                   text: "Sign Up",
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
+                  onPressed: () async {
+                    final authService = AuthService();
+
+                    final email = emailController.text.trim();
+                    final password = passwordController.text.trim();
+                    final confirmPassword = confirmPasswordController.text.trim();
+
+                    if (password != confirmPassword) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Error"),
+                          content: const Text("Passwords do not match"),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                      return;
+                    }
+
+                    final error = await authService.signup(email, password, ""); // pass name if needed
+                    if (error != null) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Signup Failed"),
+                          content: Text(error),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      );
+                    }
                   },
                 ),
                 const SizedBox(height: 40),
