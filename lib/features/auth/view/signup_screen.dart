@@ -3,6 +3,7 @@ import 'package:dhun/features/auth/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
 import '../services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -19,6 +20,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBg(
@@ -148,7 +150,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       return;
                     }
 
-                    final error = await authService.signup(email, password, ""); // pass name if needed
+                    final error = await authService.signup(
+                      email,
+                      password,
+                      nameController.text.trim(),
+                    );
                     if (error != null) {
                       showDialog(
                         context: context,
