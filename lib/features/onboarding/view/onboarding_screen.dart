@@ -61,7 +61,7 @@ Widget build(BuildContext context) {
             child: CircleAvatar(
               radius: 30,
               backgroundImage: NetworkImage(
-                'https://in.pinterest.com/pin/824158800534587359/',
+                'https://imgs.search.brave.com/XtOdQ8wX97ghjEQQyQTwhSkWf73t_dlYhB2LSLeEW-Y/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jLnNh/YXZuY2RuLmNvbS9h/cnRpc3RzL0FyaWpp/dF9TaW5naF8wMDRf/MjAyNDExMTgwNjM3/MTdfNTAweDUwMC5q/cGc',
               ),
             ),
           ),
@@ -71,7 +71,7 @@ Widget build(BuildContext context) {
             child: CircleAvatar(
               radius: 35,
               backgroundImage: NetworkImage(
-                'https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3',
+                'https://imgs.search.brave.com/XOUDQ-CuDlT_eZRlCduAsBrVMHKK_P1FgHOalpp6Reo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9l/L2U0L0xhdGFfTWFu/Z2VzaGthcl8tX3N0/aWxsXzI5MDY1X2Ny/b3AuanBn',
               ),
             ),
           ),
@@ -81,7 +81,7 @@ Widget build(BuildContext context) {
             child: CircleAvatar(
               radius: 35,
               backgroundImage: NetworkImage(
-                'https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102',
+                'https://imgs.search.brave.com/8UA9BCmpxih6jP4Bh1hO9O4oVX0PdYnGA65x1G5nJG0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ib21i/YXlzYW1hY2hhci5j/b20vd3AtY29udGVu/dC91cGxvYWRzLzIw/MjUvMTAvS2VkYXIt/RGF2ZS00Ny0xLmpw/Zw',
               ),
             ),
           ),
@@ -91,7 +91,7 @@ Widget build(BuildContext context) {
             child: CircleAvatar(
               radius: 30,
               backgroundImage: NetworkImage(
-                'https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102',
+                'https://imgs.search.brave.com/aCi7IJWqti0h3NMob415hykwrNbQiEWgyBA8amISsxk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/YnJpdGFubmljYS5j/b20vMTcvMjQ5NjE3/LTA1MC00NTc1QUI0/Qy9FZC1TaGVlcmFu/LXBlcmZvcm1zLVJv/Y2tlZmVsbGVyLVBs/YXphLVRvZGF5LVNo/b3ctTmV3LVlvcmst/MjAyMy5qcGc_dz00/MDAmaD0zMDAmYz1j/cm9w',
               ),
             ),
           ),
@@ -101,7 +101,7 @@ Widget build(BuildContext context) {
             child: CircleAvatar(
               radius: 30,
               backgroundImage: NetworkImage(
-                'https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3',
+                'https://imgs.search.brave.com/7Y_9l8vSg7wSkRLOdH9jWxcSnnnDka-HBeAqh2DDVzg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9taXIt/czMtY2RuLWNmLmJl/aGFuY2UubmV0L3By/b2plY3RzLzQwNC8w/NDYwZGQxOTUwNjky/MzEuWTNKdmNDdzVN/REFzTnpBekxEQXNP/VGcuanBn',
               ),
             ),
           ),
@@ -111,7 +111,7 @@ Widget build(BuildContext context) {
             child: CircleAvatar(
               radius: 30,
               backgroundImage: NetworkImage(
-                'https://i.scdn.co/image/ab6761610000e5eb0261696c5e23615c130388c3',
+                'https://imgs.search.brave.com/7Y_9l8vSg7wSkRLOdH9jWxcSnnnDka-HBeAqh2DDVzg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9taXIt/czMtY2RuLWNmLmJl/aGFuY2UubmV0L3By/b2plY3RzLzQwNC8w/NDYwZGQxOTUwNjky/MzEuWTNKdmNDdzVN/REFzTnpBekxEQXNP/VGcuanBn',
               ),
             ),
           ),
@@ -121,7 +121,7 @@ Widget build(BuildContext context) {
             child: CircleAvatar(
               radius: 30,
               backgroundImage: NetworkImage(
-                'https://i.scdn.co/image/ab6761610000e5ebcb6b89b6f16b2d5d8c1c5102',
+                'https://imgs.search.brave.com/HEpGAPlzUfUPlMbRGAYGu9xl-bEhLUqNxyLjbhHR3KE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJjYXZlLmNv/bS93cC93cDkwMjA2/MzAuanBn',
               ),
             ),
           ),
