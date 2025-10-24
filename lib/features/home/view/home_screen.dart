@@ -1,46 +1,77 @@
-import 'package:dhun/core/widgets/navbar.dart';
+import 'package:dhun/features/search/view/search_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:dhun/core/widgets/navbar.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
+import 'initial_songs.dart';
+import 'package:dhun/features/home/song_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Map<String, dynamic>> songs = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSongs();
+  }
+
+  Future<void> fetchSongs() async {
+    final service = SongService();
+    final data = await service.getSongs();
+    setState(() {
+      songs = data;
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       body: Stack(
-        children:[
+        children: [
           AppBg(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 60),
-                  _buildAppBar(),
-                  const SizedBox(height: 24),
-                  _buildSearchBar(),
-                  const SizedBox(height: 24),
-                  _buildSongSection("New Release"),
-                  const SizedBox(height: 24),
-                  _buildSongSection("Popular List 2025"),
-                  const SizedBox(height: 24),
-                  _buildArtistSection("Popular Artist 2025"),
-                  const SizedBox(height: 24),
-                  _buildSongSection("Popular Album 2025"),
-                ],
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 60),
+                    _buildAppBar(),
+                    const SizedBox(height: 24),
+                    _buildSearchBar(context),
+                    const SizedBox(height: 24),
+                    _buildSongSection("New Release", initialSongs),
+                    const SizedBox(height: 24),
+                    _buildSongSection("Popular List 2025", initialSongs),
+                    const SizedBox(height: 24),
+                    _buildArtistSection("Popular Artists", initialSongs),
+                    const SizedBox(height: 24),
+                    _buildSongSection("Popular Albums", initialSongs),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        const NavBar(),
-        ]
+          const NavBar(),
+        ],
       ),
     );
   }
 }
 
+/// AppBar
 Widget _buildAppBar() {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -55,7 +86,7 @@ Widget _buildAppBar() {
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w800,
-          color: Colors.white
+          color: Colors.white,
         ),
       ),
       IconButton(
@@ -70,10 +101,18 @@ Widget _buildAppBar() {
   );
 }
 
-Widget _buildSearchBar() {
+/// Search Bar
+Widget _buildSearchBar(BuildContext context) {
   return TextField(
+    readOnly: true,
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const SearchScreen()),
+      );
+    },
     decoration: InputDecoration(
-      hintText: 'Track Artist, track or album',
+      hintText: 'Track, Artist, or Album',
       hintStyle: TextStyle(color: Colors.grey.shade400),
       prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
       filled: true,
@@ -86,69 +125,62 @@ Widget _buildSearchBar() {
   );
 }
 
+/// Section Header
 Widget _buildSectionHeader(String title) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Text(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 22,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
       ),
       TextButton(
         onPressed: () {},
-        child: const Text(
-          'See All',
-          style: TextStyle(color: Colors.white70),
-        ),
+        child: const Text('See All', style: TextStyle(color: Colors.white70)),
       ),
     ],
   );
 }
 
-Widget _buildSongSection(String title) {
+/// Song Section (horizontal scroll)
+Widget _buildSongSection(String title, List<Map<String, dynamic>> songs) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // 1. Use our new header widget
       _buildSectionHeader(title),
       const SizedBox(height: 16),
-
-      // 2. Create the horizontal list
       SizedBox(
-        height: 200, // This fixed height is crucial
+        height: 200,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: 5, // We'll use 5 dummy items for now
+          itemCount: songs.length,
           itemBuilder: (context, index) {
-            // This is the individual card for each song.
+            final song = songs[index];
             return Container(
               width: 150,
               margin: const EdgeInsets.only(right: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Album Art Placeholder
                   Container(
                     height: 150,
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple,
+                      image: DecorationImage(
+                        image: NetworkImage(song['photoUrl']),
+                        fit: BoxFit.cover,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Song Title
-                  const Text(
-                    'Song Title',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    song['title'],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  // Artist Name
-                  const Text(
-                    'Artist',
-                    style: TextStyle(color: Colors.white70),
+                  Text(
+                    song['artist'],
+                    style: const TextStyle(color: Colors.white70),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -161,63 +193,79 @@ Widget _buildSongSection(String title) {
   );
 }
 
-Widget _buildArtistListItem() {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 16.0),
-    child: Row(
-      children: [
-        // Left Image Placeholder
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: Colors.deepPurple,
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        const SizedBox(width: 16),
+/// Artist Section
+Widget _buildArtistSection(String title, List<Map<String, dynamic>> songs) {
+  // Extract unique artists
+  final artists = songs
+      .map((song) => song['artist'])
+      .toSet()
+      .map(
+        (artist) => {
+          'artist': artist,
+          'photoUrl': songs.firstWhere(
+            (s) => s['artist'] == artist,
+          )['photoUrl'],
+          'songCount': songs.where((s) => s['artist'] == artist).length,
+        },
+      )
+      .toList();
 
-        // Artist Info (This will expand to fill the space)
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Artist',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              Text(
-                'Number of songs',
-                style: TextStyle(color: Colors.white70),
-              ),
-            ],
-          ),
-        ),
-
-        // Right Image Placeholder
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: Colors.deepPurple,
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildArtistSection(String title) {
   return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _buildSectionHeader(title),
       const SizedBox(height: 16),
-      // For the UI build, we'll just repeat the item.
-      // Later, this would be a ListView.
-      _buildArtistListItem(),
-      _buildArtistListItem(),
-      _buildArtistListItem(),
+      Column(
+        children: artists
+            .map(
+              (artist) => Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(artist['photoUrl']),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            artist['artist'],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            '${artist['songCount']} songs',
+                            style: const TextStyle(color: Colors.white70),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
+      ),
     ],
   );
 }
