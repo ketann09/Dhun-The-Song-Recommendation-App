@@ -39,7 +39,7 @@ class NavBar extends StatelessWidget {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.replay_outlined),
+                  icon: const Icon(Icons.folder_outlined),
                   onPressed: () {},
                 ),
                 IconButton(
