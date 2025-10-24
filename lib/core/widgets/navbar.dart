@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:dhun/features/home/view/home_screen.dart';
+import 'package:dhun/features/player/view/player_screen.dart';
 import 'package:dhun/features/profile/view/profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -21,30 +22,56 @@ class NavBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.grey.withAlpha(26),
-              
+
               borderRadius: BorderRadius.circular(30),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(icon: const Icon(Icons.home_outlined), onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
+                IconButton(
+                  icon: const Icon(Icons.home_outlined),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
                       ),
                     );
-                }
-              ),
-              IconButton(icon: const Icon(Icons.replay_outlined), onPressed: () {}),
-                IconButton(icon: const Icon(Icons.music_note), onPressed: () {}),
-                IconButton(icon: const Icon(Icons.notifications_none_outlined), onPressed: () {}),
-                IconButton(icon: const Icon(Icons.person_outline), onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.replay_outlined),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.music_note),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PlayerScreen(
+                          initialUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                          initialTitle: "Test Song",
+                          initialArtist: "Test Artist",
+                          initialArtworkUrl: "https://via.placeholder.com/300",
+                          initialTrackId: "song_009",
+                        ),
                       ),
                     );
-                }),
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.notifications_none_outlined),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.person_outline),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
