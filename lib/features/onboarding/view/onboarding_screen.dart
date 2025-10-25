@@ -17,7 +17,7 @@ Widget build(BuildContext context) {
   return BlocProvider(
     create: (context) => OnboardingBloc(),
     child: Builder(
-      builder: (context) { 
+      builder: (context) {
         return BlocListener<OnboardingBloc, OnboardingState>(
           listener: (context, state) {
             if (state is NavigatingToHome) {
@@ -27,17 +27,21 @@ Widget build(BuildContext context) {
             }
           },
           child: Scaffold(
-            body: AppBg( 
+            body: AppBg(
               child: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset('assets/images/headphones.png', height: 250),
-                      _buildArtistAvatars(),
-                      _buildTextContent(),
-                      _buildLetsGoButton(context),   
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height, // make it full screen
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Image.asset('assets/images/headphones.png', height: 250),
+                        _buildArtistAvatars(),
+                        _buildTextContent(),
+                        _buildLetsGoButton(context),
                       ],
+                    ),
                   ),
                 ),
               ),

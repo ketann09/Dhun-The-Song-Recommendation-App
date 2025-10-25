@@ -3,6 +3,7 @@ import 'package:dhun/features/home/view/home_screen.dart';
 import 'package:dhun/features/player/view/player_screen.dart';
 import 'package:dhun/features/profile/view/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:dhun/features/home/view/initial_songs.dart'; // Make sure this has your list of songs
 
 class NavBar extends StatelessWidget {
   const NavBar({super.key});
@@ -22,7 +23,6 @@ class NavBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.grey.withAlpha(26),
-
               borderRadius: BorderRadius.circular(30),
             ),
             child: Row(
@@ -39,7 +39,7 @@ class NavBar extends StatelessWidget {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.folder_outlined),
+                  icon: const Icon(Icons.replay_outlined),
                   onPressed: () {},
                 ),
                 IconButton(
@@ -47,12 +47,9 @@ class NavBar extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const PlayerScreen(
-                          initialUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-                          initialTitle: "Test Song",
-                          initialArtist: "Test Artist",
-                          initialArtworkUrl: "https://via.placeholder.com/300",
-                          initialTrackId: "song_009",
+                        builder: (_) => PlayerScreen(
+                          playlist: initialSongs, // Pass the full playlist
+                          initialIndex: 0, // Start from the first song
                         ),
                       ),
                     );

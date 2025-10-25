@@ -1,25 +1,19 @@
 import 'package:dhun/core/widgets/app_bg.dart';
 import 'package:dhun/features/player/bloc/player_bloc.dart';
-import 'package:dhun/features/player/widgets/more_options.dart'; // Ensure correct path
+import 'package:dhun/features/player/widgets/more_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// <<< CHANGE >>>: Converted to StatefulWidget
+
 class PlayerScreen extends StatefulWidget {
-  final String initialUrl;
-  final String initialTitle;
-  final String initialArtist;
-  final String initialArtworkUrl;
-  final String initialTrackId;
+  final List<Map<String, dynamic>> playlist; // All songs
+  final int initialIndex; // Which song to start
 
   const PlayerScreen({
     super.key,
-    required this.initialUrl,
-    required this.initialTitle,
-    required this.initialArtist,
-    required this.initialArtworkUrl,
-    required this.initialTrackId,
+    required this.playlist,
+    this.initialIndex = 0,
   });
 
   @override
@@ -27,7 +21,53 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  // <<< CHANGE >>>: Helper function to format Duration (MM:SS)
+  late final PlayerBloc _playerBloc;
+  late int currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.initialIndex;
+    _playerBloc = PlayerBloc();
+    _loadSong(currentIndex);
+  }
+
+  void _loadSong(int index) {
+    final song = widget.playlist[index];
+
+    _playerBloc.add(StopSong()); // Stop current song first
+
+    _playerBloc.add(LoadSong(
+      url: song['songurl'] ?? '',
+      title: song['track_name'] ?? 'Unknown',
+      artist: song['artist_name'] ?? 'Unknown',
+      artworkUrl: song['url'] ?? '',
+    ));
+
+    setState(() {
+      currentIndex = index; // update current index for next/prev
+    });
+  }
+
+  void _nextSong() {
+    if (currentIndex < widget.playlist.length - 1) {
+      _loadSong(currentIndex + 1);
+    }
+  }
+
+  void _previousSong() {
+    if (currentIndex > 0) {
+      _loadSong(currentIndex - 1);
+    }
+  }
+
+
+  @override
+  void dispose() {
+    _playerBloc.close();
+    super.dispose();
+  }
+
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final minutes = twoDigits(duration.inMinutes.remainder(60));
@@ -37,31 +77,20 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // <<< CHANGE >>>: Added BlocProvider to create and provide the BLoC
-    return BlocProvider(
-      create: (context) => PlayerBloc()
-        ..add(LoadSong(
-            url: widget.initialUrl,
-            title: widget.initialTitle,
-            artist: widget.initialArtist,
-            artworkUrl: widget.initialArtworkUrl)),
+    return BlocProvider<PlayerBloc>.value(
+      value: _playerBloc,
       child: Scaffold(
         body: AppBg(
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              // <<< CHANGE >>>: Removed SingleChildScrollView if not desired, otherwise keep it
-              // For adaptive layout, keep Column as direct child of Padding
-              // For scrollable, wrap Column with SingleChildScrollView
-              // Assuming non-scrollable based on previous discussion:
-              child: BlocBuilder<PlayerBloc, PlayerState>( // <<< CHANGE >>>: Added BlocBuilder
+              child: BlocBuilder<PlayerBloc, PlayerState>(
                 builder: (context, state) {
-                  // <<< CHANGE >>>: Determine current state details
                   Duration currentPosition = Duration.zero;
                   Duration totalDuration = Duration.zero;
-                  String currentTitle = widget.initialTitle;
-                  String currentArtist = widget.initialArtist;
-                  String currentArtworkUrl = widget.initialArtworkUrl;
+                  String currentTitle = widget.playlist[currentIndex]['track_name'] ?? 'Unknown';
+                  String currentArtist = widget.playlist[currentIndex]['artist_name'] ?? 'Unknown';
+                  String currentArtworkUrl = widget.playlist[currentIndex]['url'] ?? '';
                   bool isPlaying = false;
 
                   if (state is PlayerPlaying) {
@@ -79,50 +108,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     currentArtworkUrl = state.artworkUrl;
                     isPlaying = false;
                   }
-                  // Handle PlayerInitial state if needed (e.g., show loading or default)
 
-                  // <<< CHANGE >>>: Build the Column using state data
                   return Column(
                     children: [
                       _buildAppBar(context),
-                      // Use Expanded for adaptive layout, remove if scrolling
-                      Expanded(
-                        child: _buildAlbumArt(currentArtworkUrl), // Pass data
-                      ),
-                      _buildSongInfo(currentTitle, currentArtist, widget.initialTrackId),
+                      Expanded(child: _buildAlbumArt(currentArtworkUrl)),
+                      _buildSongInfo(currentTitle, currentArtist, widget.playlist[currentIndex]['track_id'] ?? ''),
                       const SizedBox(height: 16),
-                      _buildProgressBar(
-                          context, currentPosition, totalDuration), // Pass data
-                      _buildPlayerControls(context, isPlaying), // Pass data
+                      _buildProgressBar(context, currentPosition, totalDuration),
+                      _buildPlayerControls(context, isPlaying),
                       _buildSocialActions(),
-                      // Use Spacer for adaptive layout, remove if scrolling
-                      // const Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: const Color(0xFF1E1E1E),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(24),
-                                topRight: Radius.circular(24),
-                              ),
-                            ),
-                            builder: (ctx) { // Use different context name
-                              // Consider passing song details to the sheet if needed
-                              return const MoreOptionsSheet();
-                            },
-                          );
-                        },
-                        child: const Column(
-                          children: [
-                            Icon(Icons.keyboard_arrow_up),
-                            Text('More'),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                     ],
                   );
                 },
@@ -133,8 +128,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
       ),
     );
   }
-
-  // --- Helper Methods moved inside _PlayerScreenState ---
 
   Widget _buildAppBar(BuildContext context) {
     return Row(
@@ -157,47 +150,34 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   Widget _buildAlbumArt(String artworkUrl) {
-    // Decide whether to use Image.asset or Image.network based on the source
     ImageProvider imageProvider;
     if (artworkUrl.startsWith('http')) {
-        imageProvider = NetworkImage(artworkUrl);
+      imageProvider = NetworkImage(artworkUrl);
     } else {
-        imageProvider = AssetImage(artworkUrl); // Assuming local asset path
+      imageProvider = AssetImage(artworkUrl);
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0), // Reduced padding
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        child: Image(
-           image: imageProvider,
-           fit: BoxFit.contain, // Use contain to prevent distortion
-        ),
+        child: Image(image: imageProvider, fit: BoxFit.contain),
       ),
     );
   }
 
-
   Widget _buildSongInfo(String title, String artist, String trackId) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
-
     if (userId == null) {
-      // Not logged in
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
+              Text(title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text(
-                artist,
-                style: const TextStyle(fontSize: 18, color: Colors.white70),
-              ),
+              Text(artist, style: const TextStyle(fontSize: 18, color: Colors.white70)),
             ],
           ),
           const Icon(Icons.favorite_border, color: Colors.white, size: 32),
@@ -209,10 +189,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
         .collection('users')
         .doc(userId)
         .collection('favorites')
-        .doc(widget.initialTrackId);
+        .doc(trackId);
 
     return StreamBuilder<DocumentSnapshot>(
-      stream: favRef.snapshots(), // 🔁 listens in real-time
+      stream: favRef.snapshots(),
       builder: (context, snapshot) {
         bool isFavorite = snapshot.data?.exists ?? false;
 
@@ -235,23 +215,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
+                Text(title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(
-                  artist,
-                  style: const TextStyle(fontSize: 18, color: Colors.white70),
-                ),
+                Text(artist, style: const TextStyle(fontSize: 18, color: Colors.white70)),
               ],
             ),
             IconButton(
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.redAccent : Colors.white,
-                size: 32,
-              ),
+              icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.redAccent : Colors.white, size: 32),
               onPressed: toggleFavorite,
             ),
           ],
@@ -259,8 +230,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
       },
     );
   }
-  Widget _buildProgressBar(
-      BuildContext context, Duration position, Duration duration) {
+
+  Widget _buildProgressBar(BuildContext context, Duration position, Duration duration) {
     return Column(
       children: [
         SliderTheme(
@@ -273,12 +244,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
             thumbColor: Colors.white,
           ),
           child: Slider(
-            value: position.inSeconds.toDouble().clamp(0.0, duration.inSeconds.toDouble()), // Use state data
+            value: position.inSeconds.toDouble().clamp(0.0, duration.inSeconds.toDouble()),
             min: 0,
-            max: duration.inSeconds.toDouble() + 1.0, // Use state data (+1 avoids potential clamp issue)
+            max: duration.inSeconds.toDouble() + 1.0,
             onChanged: (value) {
-              // <<< CHANGE >>>: Send Seek event to BLoC
-              context.read<PlayerBloc>().add(SeekSong(Duration(seconds: value.toInt())));
+              _playerBloc.add(SeekSong(Duration(seconds: value.toInt())));
             },
           ),
         ),
@@ -286,7 +256,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // <<< CHANGE >>>: Format time dynamically
             children: [Text(_formatDuration(position)), Text(_formatDuration(duration))],
           ),
         ),
@@ -294,7 +263,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
-  // <<< CHANGE >>>: Takes isPlaying from state, adds BLoC events
   Widget _buildPlayerControls(BuildContext context, bool isPlaying) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -303,33 +271,24 @@ class _PlayerScreenState extends State<PlayerScreen> {
         children: [
           IconButton(
             icon: const Icon(Icons.skip_previous, size: 40),
-            onPressed: () {
-               // TODO: Add SkipPrevious event later
-            },
+            onPressed: _previousSong,
           ),
           Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.purpleAccent,
-            ),
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.purpleAccent),
             child: IconButton(
-              // <<< CHANGE >>>: Toggle icon based on state
-              icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
-                  size: 60, color: Colors.white),
+              icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 60, color: Colors.white),
               onPressed: () {
-                // <<< CHANGE >>>: Send Pause or Resume event to BLoC
                 if (isPlaying) {
-                  context.read<PlayerBloc>().add(PauseSong());
+                  _playerBloc.add(PauseSong());
                 } else {
-                  context.read<PlayerBloc>().add(ResumeSong());
+                  _playerBloc.add(ResumeSong());
                 }
               },
             ),
           ),
           IconButton(
             icon: const Icon(Icons.skip_next, size: 40),
-            onPressed: () {
-            },
+            onPressed: _nextSong,
           ),
         ],
       ),
@@ -338,9 +297,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Widget _buildSocialActions() {
     Widget buildSocialButton(IconData icon, String label) {
-      return Column(
-        children: [Icon(icon, size: 28), const SizedBox(height: 4), Text(label)],
-      );
+      return Column(children: [Icon(icon, size: 28), const SizedBox(height: 4), Text(label)]);
     }
 
     return Row(
@@ -352,4 +309,4 @@ class _PlayerScreenState extends State<PlayerScreen> {
       ],
     );
   }
-} // End of _PlayerScreenState
+}

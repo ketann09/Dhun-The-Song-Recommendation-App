@@ -1,5 +1,6 @@
 import 'package:dhun/core/widgets/app_bg.dart';
 import 'package:dhun/core/widgets/navbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -64,31 +65,68 @@ Widget _buildAppBar(BuildContext context) {
   );
 }
 
+
+
+
 Widget _buildProfileHeader() {
-  return const Row(
-    children: [
+  final User? user = FirebaseAuth.instance.currentUser;
+
+  // Default values
+  String initial = '?';
+  String firstName = 'User';
+  String email = '';
+
+  if (user != null) {
+    // Use null-aware access
+    email = user.email ?? '';
+
+    if (user.displayName != null && user.displayName!.isNotEmpty) {
+      firstName = user.displayName!.split(' ').first;
+    } else if (email.isNotEmpty) {
+      firstName = email.split('@').first;
+    }
+
+    if (firstName.isNotEmpty) {
+      initial = firstName[0].toUpperCase();
+    }
+  }
+
+  return Row(
+      children: [
       CircleAvatar(
-        radius: 40,
-        backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
-      ),
-      SizedBox(width: 16),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Amit',
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+      radius: 40,
+      backgroundColor: Colors.deepPurpleAccent.withOpacity(0.8),
+      backgroundImage: (user?.photoURL != null && user!.photoURL!.isNotEmpty)
+          ? NetworkImage(user.photoURL!)
+          : null,
+      child: (user?.photoURL == null || user!.photoURL!.isEmpty)
+          ? Text(
+          initial,
+          style: const TextStyle(
+              fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
-          Text(
-            '@amitrai7',
-            style: TextStyle(fontSize: 16, color: Colors.white70),
-          ),
-        ],
+      )
+          : null,
       ),
-    ],
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              firstName,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              email,
+              style: const TextStyle(fontSize: 16, color: Colors.white70),
+            ),
+          ],
+        ),
+      ],
   );
 }
-
 Widget _buildSettingsTile({required IconData icon, required String title}) {
   return Column(
     children: [

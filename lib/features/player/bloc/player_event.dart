@@ -40,3 +40,4 @@ class _PlayerStatusChanged extends PlayerEvent {
     required this.duration,
   });
 }
+class StopSong extends PlayerEvent {}

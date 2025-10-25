@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/navbar.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
 import '../../player/view/player_screen.dart';
+import '../../profile/view/profile_screen.dart';
+import '../../search/view/search_screen.dart';
 import 'initial_songs.dart';
 import 'package:dhun/features/home/song_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dhun/features/auth/services/firestore_service.dart';
+import 'package:dhun/data/models/song_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
+
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -22,7 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final songService = SongService();
   final firestoreService = FirestoreService();
-
+  String? userPhotoUrl;
+  String? userEmail;
   @override
   void initState() {
     super.initState();
@@ -31,14 +38,21 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchRecommendations();
   }
 
-  /// Create user profile if first login
   Future<void> _initUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
+
     if (user != null) {
+      // Create user profile in Firestore
       await firestoreService.createUserProfile(
         uid: user.uid,
         email: user.email ?? '',
       );
+
+      // Update state to show user info in UI
+      setState(() {
+        userPhotoUrl = user.photoURL;
+        userEmail = user.email;
+      });
     }
   }
 
@@ -51,17 +65,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchRecommendations() async {
+    setState(() => isRecLoading = true);
+
     try {
-      final recs = await songService.getRecommendations();
+      // Use numeric user id
+      final int numericUserId = 12345; // Replace with dynamic id later if needed
+      final url = "https://song-recommender-4.onrender.com/recommend_hybrid?user_id=$numericUserId&top_k=10&alpha=0.5";
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) {
+        print("ML backend returned status: ${response.statusCode}");
+        setState(() => isRecLoading = false);
+        return;
+      }
+
+      final body = jsonDecode(response.body);
+      print("ML response: $body"); // Debug: check what is returned
+
+      if (body['status'] != 'success' || body['data'] == null) {
+        print("No recommendations found");
+        setState(() => isRecLoading = false);
+        return;
+      }
+
+      final recs = body['data']['recommendations'] as List<dynamic>;
+
+      final mapped = recs.map((rec) => {
+        'track_id': rec['song_id'],
+        'track_name': rec['title'],
+        'artist_name': rec['artist'],
+        'url': rec['cover_image'],   // artwork
+        'songurl': rec['url'],       // audio
+      }).toList();
+
       setState(() {
-        recommendations = recs;
+        recommendations = List<Map<String, dynamic>>.from(mapped);
         isRecLoading = false;
       });
+
+      print("Mapped recommendations: $mapped"); // Debug: see final mapped data
+
     } catch (e) {
       print("Error fetching recommendations: $e");
-      setState(() {
-        isRecLoading = false;
-      });
+      setState(() => isRecLoading = false);
     }
   }
 
@@ -107,13 +153,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAppBar() {
+    final String initial = (userEmail != null && userEmail!.isNotEmpty)
+        ? userEmail![0].toUpperCase()
+        : '?';
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const CircleAvatar(
-          radius: 24,
-          backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3'),
+        // Only Avatar, clickable
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            );
+          },
+          child: CircleAvatar(
+            radius: 26,
+            backgroundColor: Colors.deepPurpleAccent.withOpacity(0.8),
+            backgroundImage: (userPhotoUrl != null && userPhotoUrl!.isNotEmpty)
+                ? NetworkImage(userPhotoUrl!)
+                : null,
+            child: (userPhotoUrl == null || userPhotoUrl!.isEmpty)
+                ? Text(
+              initial,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            )
+                : null,
+          ),
         ),
+
         const Text(
           "Dhun",
           textAlign: TextAlign.center,
@@ -123,6 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.white,
           ),
         ),
+
         IconButton(
           onPressed: () {},
           icon: const Icon(
@@ -136,16 +210,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSearchBar() {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Track, Artist, or Album',
-        hintStyle: TextStyle(color: Colors.grey.shade400),
-        prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
-        filled: true,
-        fillColor: const Color(0xFF3A2F7D).withAlpha(128),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SearchScreen()),
+        );
+      },
+      child: AbsorbPointer( // prevent keyboard opening automatically
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: 'Track, Artist, or Album',
+            hintStyle: TextStyle(color: Colors.grey.shade400),
+            prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
+            filled: true,
+            fillColor: const Color(0xFF3A2F7D).withAlpha(128),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: BorderSide.none,
+            ),
+          ),
         ),
       ),
     );
@@ -187,28 +271,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () async {
                   final user = FirebaseAuth.instance.currentUser;
                   if (user != null && song['track_id'] != null) {
-                    // Log user interaction
                     await firestoreService.logInteraction(
                       userId: user.uid,
                       trackId: song['track_id'],
                       interactionStrength: 1,
                     );
                   }
-                  // Navigate to PlayerScreen
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => PlayerScreen(
-                        initialUrl: song['url'],
-                        initialTitle: song['track_name'],
-                        initialArtist: song['artist_name'],
-                        initialArtworkUrl: song['url'],
-                        initialTrackId: song['track_id'],
-                      ),
+                      builder: (_) =>
+                          PlayerScreen(
+                            playlist: songs,
+                            initialIndex: index,
+                          ),
                     ),
-                  );
+                  ).then((_) {
+                    // Optional: reset currentIndex if needed
+                  });
                 },
-                child: Container(
+
+    child: Container(
                   width: 150,
                   margin: const EdgeInsets.only(right: 16),
                   child: Column(
@@ -218,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 150,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage(song['url']),
+                            image: NetworkImage(song['url'] ?? ''),
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(12),
@@ -226,12 +310,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        song['track_name'],
+                        song['track_name'] ?? '',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        song['artist_name'],
+                        song['artist_name'] ?? '',
                         style: const TextStyle(color: Colors.white70),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -252,11 +336,8 @@ class _HomeScreenState extends State<HomeScreen> {
         .toSet()
         .map((artist) => {
       'artist': artist,
-      'photoUrl': songs
-          .firstWhere((s) => s['artist_name'] == artist)['url'],
-      'songCount': songs
-          .where((s) => s['artist_name'] == artist)
-          .length,
+      'photoUrl': songs.firstWhere((s) => s['artist_name'] == artist)['url'],
+      'songCount': songs.where((s) => s['artist_name'] == artist).length,
     })
         .toList();
 
@@ -277,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 60,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(artist['photoUrl']),
+                        image: NetworkImage(artist['photoUrl'] ?? ''),
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -289,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          artist['artist'],
+                          artist['artist'] ?? '',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -352,15 +433,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       interactionStrength: 1,
                     );
                   }
+
+                  // Open PlayerScreen with the **recommendations list** so you can skip next/prev properly
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => PlayerScreen(
-                        initialUrl: song['url'],
-                        initialTitle: song['track_name'],
-                        initialArtist: song['artist_name'],
-                        initialArtworkUrl: song['url'],
-                        initialTrackId: song['track_id'],
+                        playlist: recommendations, // pass recommendations list
+                        initialIndex: index,        // start at tapped song
                       ),
                     ),
                   );
@@ -375,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 150,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage(song['url']),
+                            image: NetworkImage(song['url'] ?? ''),
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(12),
@@ -383,12 +463,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        song['track_name'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        song['track_name'] ?? '',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        song['artist_name'],
+                        song['artist_name'] ?? '',
                         style: const TextStyle(color: Colors.white70),
                         overflow: TextOverflow.ellipsis,
                       ),

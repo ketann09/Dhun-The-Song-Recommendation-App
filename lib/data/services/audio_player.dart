@@ -12,35 +12,36 @@ class AudioPlayerService {
       final audioSource = AudioSource.uri(
         Uri.parse(url),
         tag: MediaItem(
-          id: url, 
-          album: "Unknown Album", 
+          id: url,
+          album: "Unknown Album",
           title: title,
           artist: artist,
           artUri: Uri.parse(artworkUrl),
         ),
       );
       await _audioPlayer.setAudioSource(audioSource);
-      _audioPlayer.play();
+      await _audioPlayer.play();  // <-- await here
     } catch (e) {
       print("Error loading or playing song: $e");
     }
   }
 
-  void pause() {
-    _audioPlayer.pause();
+  Future<void> pause() async {
+    await _audioPlayer.pause();
   }
 
-  void resume() {
-    _audioPlayer.play(); 
+  Future<void> resume() async {
+    await _audioPlayer.play();
   }
 
-  void seek(Duration position) {
-    _audioPlayer.seek(position);
+  Future<void> seek(Duration position) async {
+    await _audioPlayer.seek(position);
   }
 
-  void stop() {
-    _audioPlayer.stop();
+  Future<void> stop() async {
+    await _audioPlayer.stop();
   }
+
 
   Stream<PlayerState> get playerStateStream => _audioPlayer.playerStateStream;
 
