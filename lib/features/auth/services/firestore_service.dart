@@ -3,30 +3,57 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Create user profile if first login
   Future<void> createUserProfile({
     required String uid,
     required String email,
     String name = "",
   }) async {
-    await _firestore.collection('users').doc(uid).set({
-      'uid': uid,
-      'email': email,
-      'name': name,
-      'favorites': [],
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    final userRef = _firestore.collection('users').doc(uid);
+    final doc = await userRef.get();
+    if (!doc.exists) {
+      await userRef.set({
+        'uid': uid,
+        'email': email,
+        'name': name,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
   }
 
+  /// Log user interaction with a song
   Future<void> logInteraction({
     required String userId,
     required String trackId,
     required int interactionStrength,
   }) async {
-    await _firestore.collection('interactions').add({
-      'userId': userId,
+    final ref = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('interactions')
+        .doc(trackId);
+
+    await ref.set({
       'trackId': trackId,
       'strength': interactionStrength,
-      'createdAt': FieldValue.serverTimestamp(),
+      'lastInteracted': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  /// Add a song to the 'songs' collection
+  Future<void> addSong({
+    required String trackId,
+    required String trackName,
+    required String artistName,
+    required String genre,
+    required String url,
+  }) async {
+    await _firestore.collection('songs').doc(trackId).set({
+      'track_id': trackId,
+      'track_name': trackName,
+      'artist_name': artistName,
+      'genre': genre,
+      'url': url,
     });
   }
 }

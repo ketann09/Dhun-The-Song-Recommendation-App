@@ -33,7 +33,7 @@ class NavBar extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const HomeScreen(),
+                        builder: (context) =>  HomeScreen(),
                       ),
                     );
                   },
@@ -52,6 +52,7 @@ class NavBar extends StatelessWidget {
                           initialTitle: "Test Song",
                           initialArtist: "Test Artist",
                           initialArtworkUrl: "https://via.placeholder.com/300",
+                          initialTrackId: "song_009",
                         ),
                       ),
                     );

@@ -6,25 +6,44 @@ import 'package:firebase_auth/firebase_auth.dart';
 class SongService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // ✅ Fetch songs from Firestore (e.g. new releases)
+  /// Fetch songs from Firestore
   Future<List<Map<String, dynamic>>> getSongs() async {
-    final snapshot = await _firestore.collection('songs').limit(10).get();
-    return snapshot.docs.map((doc) => doc.data()).toList();
+    try {
+      final snapshot = await _firestore.collection('songs').limit(20).get();
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      print("Error fetching songs from Firestore: $e");
+      return [];
+    }
   }
 
-  // ✅ Fetch recommendations from ML API
   Future<List<Map<String, dynamic>>> getRecommendations() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) throw Exception("User not logged in");
+    if (user == null) {
+      print("User not logged in");
+      return [];
+    }
 
-    final response = await http.get(
-      Uri.parse("https://your-backend.com/recommendations?userId=${user.uid}"),
+    final url = "https://song-recommender-4.onrender.com/";
+    final body = jsonEncode({"user_id": user.uid});
+    print("POST $url with body: $body");
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: body,
     );
 
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      final data = List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      print("Recommendations: $data");
+      return data;
     } else {
-      throw Exception("Failed to load recommendations");
+      print("Failed to load recommendations");
+      return [];
     }
   }
 }

@@ -3,13 +3,15 @@ import 'package:dhun/features/player/bloc/player_bloc.dart';
 import 'package:dhun/features/player/widgets/more_options.dart'; // Ensure correct path
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 // <<< CHANGE >>>: Converted to StatefulWidget
 class PlayerScreen extends StatefulWidget {
   final String initialUrl;
   final String initialTitle;
   final String initialArtist;
   final String initialArtworkUrl;
+  final String initialTrackId;
 
   const PlayerScreen({
     super.key,
@@ -17,6 +19,7 @@ class PlayerScreen extends StatefulWidget {
     required this.initialTitle,
     required this.initialArtist,
     required this.initialArtworkUrl,
+    required this.initialTrackId,
   });
 
   @override
@@ -86,7 +89,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       Expanded(
                         child: _buildAlbumArt(currentArtworkUrl), // Pass data
                       ),
-                      _buildSongInfo(currentTitle, currentArtist), // Pass data
+                      _buildSongInfo(currentTitle, currentArtist, widget.initialTrackId),
                       const SizedBox(height: 16),
                       _buildProgressBar(
                           context, currentPosition, totalDuration), // Pass data
@@ -153,7 +156,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
-  // <<< CHANGE >>>: Takes artworkUrl from state
   Widget _buildAlbumArt(String artworkUrl) {
     // Decide whether to use Image.asset or Image.network based on the source
     ImageProvider imageProvider;
@@ -169,7 +171,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
         borderRadius: BorderRadius.circular(24),
         child: Image(
            image: imageProvider,
-           // Removed fixed height/width to work with Expanded
            fit: BoxFit.contain, // Use contain to prevent distortion
         ),
       ),
@@ -177,36 +178,87 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
 
-  // <<< CHANGE >>>: Takes title and artist from state
-  Widget _buildSongInfo(String title, String artist) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildSongInfo(String title, String artist, String trackId) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      // Not logged in
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                artist,
+                style: const TextStyle(fontSize: 18, color: Colors.white70),
+              ),
+            ],
+          ),
+          const Icon(Icons.favorite_border, color: Colors.white, size: 32),
+        ],
+      );
+    }
+
+    final favRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('favorites')
+        .doc(widget.initialTrackId);
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: favRef.snapshots(), // 🔁 listens in real-time
+      builder: (context, snapshot) {
+        bool isFavorite = snapshot.data?.exists ?? false;
+
+        Future<void> toggleFavorite() async {
+          if (isFavorite) {
+            await favRef.delete();
+          } else {
+            await favRef.set({
+              'track_id': trackId,
+              'title': title,
+              'artist': artist,
+              'timestamp': FieldValue.serverTimestamp(),
+            });
+          }
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title, // Use state data
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  artist,
+                  style: const TextStyle(fontSize: 18, color: Colors.white70),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              artist, // Use state data
-              style: const TextStyle(fontSize: 18, color: Colors.white70),
+            IconButton(
+              icon: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: isFavorite ? Colors.redAccent : Colors.white,
+                size: 32,
+              ),
+              onPressed: toggleFavorite,
             ),
           ],
-        ),
-        IconButton(
-          icon: const Icon(Icons.favorite_border, size: 32),
-          onPressed: () {
-             // TODO: Add Favorite event to BLoC later
-          },
-        ),
-      ],
+        );
+      },
     );
   }
-
-  // <<< CHANGE >>>: Takes position and duration from state, adds BLoC event
   Widget _buildProgressBar(
       BuildContext context, Duration position, Duration duration) {
     return Column(
@@ -277,7 +329,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
           IconButton(
             icon: const Icon(Icons.skip_next, size: 40),
             onPressed: () {
-               // TODO: Add SkipNext event later
             },
           ),
         ],

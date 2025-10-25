@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'firebase_options.dart';
 import 'features/onboarding/view/onboarding_screen.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
