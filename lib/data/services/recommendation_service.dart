@@ -13,17 +13,14 @@ class RecommendationService {
       final body = response.body.trim();
 
       try {
-        // ✅ If backend already returns valid JSON list
         final decoded = json.decode(body);
         if (decoded is List) return decoded;
         if (decoded is Map && decoded.containsKey('recommendations')) {
           return decoded['recommendations'];
         }
       } catch (_) {
-        // continue to fallback below
       }
 
-      // ✅ Fallback: sometimes backend returns single string list → convert manually
       final cleaned = body
           .replaceAll("'", '"')
           .replaceAll("track_id:", '"track_id":')

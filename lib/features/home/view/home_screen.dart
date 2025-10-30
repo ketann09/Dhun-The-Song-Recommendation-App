@@ -8,7 +8,6 @@ import 'initial_songs.dart';
 import 'package:dhun/features/home/song_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dhun/features/auth/services/firestore_service.dart';
-import 'package:dhun/data/models/song_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -42,13 +41,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Create user profile in Firestore
       await firestoreService.createUserProfile(
         uid: user.uid,
         email: user.email ?? '',
       );
 
-      // Update state to show user info in UI
       setState(() {
         userPhotoUrl = user.photoURL;
         userEmail = user.email;
@@ -68,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => isRecLoading = true);
 
     try {
-      // Use numeric user id
       final int numericUserId = 12345; // Replace with dynamic id later if needed
       final url = "https://song-recommender-4.onrender.com/recommend_hybrid?user_id=$numericUserId&top_k=10&alpha=0.5";
 
@@ -139,8 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 24),
                     _buildArtistSection("Popular Artists", initialSongs),
                     const SizedBox(height: 24),
-                    _buildRecommendationSection(),
-                    const SizedBox(height: 24),
+
                   ],
                 ),
               ),
@@ -401,87 +396,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRecommendationSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader("Recommended For You"),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 200,
-          child: isRecLoading
-              ? const Center(child: CircularProgressIndicator())
-              : recommendations.isEmpty
-              ? const Center(
-            child: Text(
-              "No recommendations yet",
-              style: TextStyle(color: Colors.white70, fontSize: 16),
-            ),
-          )
-              : ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: recommendations.length,
-            itemBuilder: (context, index) {
-              final song = recommendations[index];
-              return GestureDetector(
-                onTap: () async {
-                  final user = FirebaseAuth.instance.currentUser;
-                  if (user != null && song['track_id'] != null) {
-                    await firestoreService.logInteraction(
-                      userId: user.uid,
-                      trackId: song['track_id'],
-                      interactionStrength: 1,
-                    );
-                  }
-
-                  // Open PlayerScreen with the **recommendations list** so you can skip next/prev properly
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PlayerScreen(
-                        playlist: recommendations, // pass recommendations list
-                        initialIndex: index,        // start at tapped song
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 150,
-                  margin: const EdgeInsets.only(right: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(song['url'] ?? ''),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        song['track_name'] ?? '',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        song['artist_name'] ?? '',
-                        style: const TextStyle(color: Colors.white70),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
 }

@@ -36,58 +36,60 @@ class _RecommedationScreenState extends State<RecommedationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBg(
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildAppBar(context),
-                  const SizedBox(height: 24),
-                  _buildTextField(
-                      _trackIdController, 'Track ID (e.g., 0BRjO6ga9RKCKjfDqeFgWV)'),
-                  const SizedBox(height: 16),
-                  _buildTextField(_nController, 'Number of Recommendations (n)'),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _getRecommendations,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purpleAccent,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+        child: Center(
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildAppBar(context),
+                    const SizedBox(height: 24),
+                    _buildTextField(
+                        _trackIdController, 'Track ID (e.g., 0BRjO6ga9RKCKjfDqeFgWV)'),
+                    const SizedBox(height: 16),
+                    _buildTextField(_nController, 'Number of Recommendations (n)'),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _getRecommendations,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purpleAccent,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Get Recommendations',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                        child: const Text(
+                          'Get Recommendations',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Results:',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const Divider(color: Colors.white54),
-                  _parsedRecommendations.isEmpty
-                      ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      _result,
-                      style: const TextStyle(color: Colors.white70, fontSize: 16),
+                    const SizedBox(height: 32),
+                    const Text(
+                      'Results:',
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
-                  )
-                      : _buildResults(_parsedRecommendations),
+                    const Divider(color: Colors.white54),
+                    _parsedRecommendations.isEmpty
+                        ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        _result,
+                        style: const TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                    )
+                        : _buildResults(_parsedRecommendations),
 
-                ],
+                  ],
+                ),
               ),
             ),
           ),
