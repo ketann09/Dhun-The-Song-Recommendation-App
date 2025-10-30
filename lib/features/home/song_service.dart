@@ -19,8 +19,8 @@ class SongService {
     }
   }
 
-  // Fetch recommendations from your ML backend
-  Future<List<Map<String, dynamic>>> getRecommendations() async {
+  Future<List<Map<String, dynamic>>> getRecommendations() async
+  {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return [];
 

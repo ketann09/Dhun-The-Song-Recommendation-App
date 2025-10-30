@@ -10,10 +10,13 @@ class FirestoreService {
     required String uid,
     required String email,
     String name = "",
-  }) async {
+  })
+  async
+  {
     final userRef = _firestore.collection('users').doc(uid);
     final doc = await userRef.get();
-    if (!doc.exists) {
+    if (!doc.exists)
+    {
       await userRef.set({
         'uid': uid,
         'email': email,

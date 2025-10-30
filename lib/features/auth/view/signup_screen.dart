@@ -3,7 +3,6 @@ import 'package:dhun/features/auth/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dhun/core/widgets/app_bg.dart';
 import '../services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -16,7 +15,8 @@ final TextEditingController passwordController = TextEditingController();
 final TextEditingController confirmPasswordController = TextEditingController();
 final TextEditingController nameController = TextEditingController();
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends State<SignupScreen>
+{
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   @override

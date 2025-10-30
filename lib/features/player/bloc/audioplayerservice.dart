@@ -7,8 +7,8 @@ class AudioPlayerService {
   final AudioPlayer _player = AudioPlayer();
 
   Future<void> playSong(String url, String title, String artist, String artworkUrl) async {
-    await _player.setUrl(url);  // load the song
-    await _player.play();        // start playback
+    await _player.setUrl(url);
+    await _player.play();     
   }
 
   Future<void> pause() async {
@@ -23,7 +23,6 @@ class AudioPlayerService {
     await _player.seek(position);
   }
 
-  // ✅ Add this method
   Future<void> stop() async {
     await _player.stop();
   }
