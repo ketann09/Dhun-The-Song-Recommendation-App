@@ -36,7 +36,7 @@ Widget build(BuildContext context) {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Image.asset('assets/images/headphones.png', height: 250),
+                        Image.asset('assets/images/logo.jpg', height: 200),
                         _buildArtistAvatars(),
                         _buildTextContent(),
                         _buildLetsGoButton(context),

@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'package:dhun/features/home/view/home_screen.dart';
 import 'package:dhun/features/player/view/player_screen.dart';
 import 'package:dhun/features/profile/view/profile_screen.dart';
+import 'package:dhun/features/recommedation/view/recommedations_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:dhun/features/home/view/initial_songs.dart'; // Make sure this has your list of songs
-
+import 'package:dhun/features/home/view/initial_songs.dart'; 
 class NavBar extends StatelessWidget {
   const NavBar({super.key});
 
@@ -39,8 +39,14 @@ class NavBar extends StatelessWidget {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.replay_outlined),
-                  onPressed: () {},
+                  icon: const Icon(Icons.insights),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const RecommedationScreen(),
+                      ),
+                    );
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.music_note),
@@ -48,8 +54,7 @@ class NavBar extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => PlayerScreen(
-                          playlist: initialSongs, // Pass the full playlist
-                          initialIndex: 0, // Start from the first song
+                          playlist: initialSongs, 
                         ),
                       ),
                     );
